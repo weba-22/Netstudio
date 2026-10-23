@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import { getFirebaseAdminFirestore } from './firebaseAdmin';
+import { getSupabaseAdmin } from './supabaseAdmin';
 import {
   MediaItem,
   LiveChannel,
@@ -188,7 +188,7 @@ class MediaStore {
 
     // 3. Reset remote Supabase tables completely if connected
     try {
-      const supabase = getFirebaseAdminFirestore();
+      const supabase = getSupabaseAdmin();
       if (supabase) {
         // Delete all records in all persistent tables
         const tablesToPurge = [
@@ -292,7 +292,7 @@ class MediaStore {
 
     // 4. Sync with Supabase table "users" if initialized
     try {
-      const supabase = getFirebaseAdminFirestore();
+      const supabase = getSupabaseAdmin();
       if (supabase) {
         const { data: usersSnap, error: usersError } = await supabase.from('users').select('*');
         if (usersError) throw usersError;
@@ -522,7 +522,7 @@ class MediaStore {
     this.saveDatabase(this.db);
 
      try {
-       const supabase = getFirebaseAdminFirestore();
+       const supabase = getSupabaseAdmin();
        if (supabase) {
          await supabase.from('movies').upsert(cleanItem, { onConflict: 'id' });
        }
@@ -593,7 +593,7 @@ class MediaStore {
       this.saveDatabase(this.db);
 
        try {
-         const supabase = getFirebaseAdminFirestore();
+         const supabase = getSupabaseAdmin();
          if (supabase) {
            await supabase.from('movies').upsert(updated, { onConflict: 'id' });
          }
@@ -610,7 +610,7 @@ class MediaStore {
     this.saveDatabase(this.db);
 
      try {
-       const supabase = getFirebaseAdminFirestore();
+       const supabase = getSupabaseAdmin();
        if (supabase) {
          await supabase.from('movies').delete().eq('id', id);
        }
@@ -642,7 +642,7 @@ class MediaStore {
     this.saveDatabase(this.db);
 
      try {
-       const supabase = getFirebaseAdminFirestore();
+       const supabase = getSupabaseAdmin();
        if (supabase) {
          for (const m of movies) {
            await supabase.from('movies').upsert(m, { onConflict: 'id' });
@@ -673,7 +673,7 @@ class MediaStore {
     this.saveDatabase(this.db);
 
      try {
-       const supabase = getFirebaseAdminFirestore();
+       const supabase = getSupabaseAdmin();
        if (supabase) {
          await supabase.from('channels').upsert(channel, { onConflict: 'id' });
        }
@@ -690,7 +690,7 @@ class MediaStore {
       this.saveDatabase(this.db);
 
       try {
-        const firestore = getFirebaseAdminFirestore();
+        const firestore = getSupabaseAdmin();
         if (firestore) {
           firestore.collection('channels').doc(id).set(this.db.channels[index], { merge: true }).catch(() => {});
         }
@@ -707,7 +707,7 @@ class MediaStore {
     this.saveDatabase(this.db);
 
     try {
-      const firestore = getFirebaseAdminFirestore();
+      const firestore = getSupabaseAdmin();
       if (firestore) {
         firestore.collection('channels').doc(id).delete().catch(() => {});
       }
@@ -739,7 +739,7 @@ class MediaStore {
     this.saveDatabase(this.db);
 
     try {
-      const firestore = getFirebaseAdminFirestore();
+      const firestore = getSupabaseAdmin();
       if (firestore) {
         const batch = firestore.batch();
         for (const c of channels) {
@@ -773,7 +773,7 @@ class MediaStore {
     this.saveDatabase(this.db);
 
     try {
-      const firestore = getFirebaseAdminFirestore();
+      const firestore = getSupabaseAdmin();
       if (firestore) {
         firestore.collection('plans').doc(plan.id).set(plan, { merge: true }).catch(() => {});
       }
@@ -791,7 +791,7 @@ class MediaStore {
       this.saveDatabase(this.db);
 
       try {
-        const firestore = getFirebaseAdminFirestore();
+        const firestore = getSupabaseAdmin();
         if (firestore) {
           firestore.collection('plans').doc(id).set(this.db.plans[index], { merge: true }).catch(() => {});
         }
@@ -809,7 +809,7 @@ class MediaStore {
     this.saveDatabase(this.db);
 
     try {
-      const firestore = getFirebaseAdminFirestore();
+      const firestore = getSupabaseAdmin();
       if (firestore) {
         firestore.collection('plans').doc(id).delete().catch(() => {});
       }
@@ -836,7 +836,7 @@ class MediaStore {
     this.saveDatabase(this.db);
 
     try {
-      const firestore = getFirebaseAdminFirestore();
+      const firestore = getSupabaseAdmin();
       if (firestore) {
         firestore.collection('promotions').doc('current').set(this.db.promotion, { merge: true }).catch(() => {});
       }
@@ -943,7 +943,7 @@ class MediaStore {
 
     // Also delete from Firestore if Firestore is initialized
     try {
-      const firestore = getFirebaseAdminFirestore();
+      const firestore = getSupabaseAdmin();
       if (firestore) {
         firestore.collection('users').doc(userId).delete().catch(() => {});
       }
@@ -990,7 +990,7 @@ class MediaStore {
 
     // Also purge rogue admin docs from Firestore if available
     try {
-      const firestore = getFirebaseAdminFirestore();
+      const firestore = getSupabaseAdmin();
       if (firestore) {
         firestore.collection('users').get().then((snap) => {
           snap.forEach((doc) => {
