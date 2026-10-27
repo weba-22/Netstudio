@@ -217,14 +217,14 @@ export const OwnerTreasuryPage: React.FC = () => {
             <div>
               <label className="block text-xs font-semibold text-neutral-300 mb-1.5 flex items-center justify-between">
                 <span>{t('twoFactorPin')}</span>
-                <span className="text-[10px] text-green-400/80">Owner PIN (9924)</span>
+                <span className="text-[10px] text-green-400/80">Required verification</span>
               </label>
               <input
                 type="password"
                 maxLength={6}
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value)}
-                placeholder="9924"
+                placeholder="Enter your PIN"
                 required
                 className="w-full bg-black/60 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-600 tracking-widest text-center font-mono focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
               />
@@ -852,7 +852,7 @@ export const OwnerTreasuryPage: React.FC = () => {
                   maxLength={6}
                   value={withdrawPin}
                   onChange={(e) => setWithdrawPin(e.target.value)}
-                  placeholder="Enter 2FA PIN (9924)"
+                  placeholder="Enter your 2FA PIN"
                   required
                   className="w-full bg-black border border-neutral-700 rounded-xl px-3 py-2 text-sm text-white text-center font-mono tracking-widest focus:outline-none focus:border-green-500"
                 />
@@ -926,7 +926,7 @@ export const OwnerTreasuryPage: React.FC = () => {
                   maxLength={6}
                   value={newPin}
                   onChange={(e) => setNewPin(e.target.value)}
-                  placeholder="e.g. 9924"
+                  placeholder="Enter a new PIN"
                   className="w-full bg-black/60 border border-neutral-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-green-500"
                 />
               </div>
@@ -940,7 +940,7 @@ export const OwnerTreasuryPage: React.FC = () => {
                   maxLength={6}
                   value={currentPin}
                   onChange={(e) => setCurrentPin(e.target.value)}
-                  placeholder="Current PIN (9924)"
+                  placeholder="Enter current PIN"
                   required
                   className="w-full bg-black/60 border border-neutral-700 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-green-500"
                 />

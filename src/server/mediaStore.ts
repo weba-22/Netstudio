@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import 'dotenv/config';
 import { getSupabaseAdmin } from './supabaseAdmin';
 import {
   MediaItem,
@@ -98,6 +99,21 @@ export function hashPassword(password: string, salt: string): string {
   return crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
 }
 
+function getRequiredSecret(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`${name} must be configured in the environment before starting NetStudio.`);
+  }
+  if (name === 'OWNER_TWO_FACTOR_PIN') {
+    if (!/^\d{6}$/.test(value)) {
+      throw new Error('OWNER_TWO_FACTOR_PIN must be exactly six digits.');
+    }
+  } else if (value.length < 12) {
+    throw new Error(`${name} must contain at least 12 characters.`);
+  }
+  return value;
+}
+
 const INITIAL_FINANCIAL_TRANSACTIONS: FinancialTransaction[] = [];
 
 const INITIAL_NOTIFICATIONS: UserNotification[] = [
@@ -184,6 +200,13 @@ class MediaStore {
     this.db.adminCredentials = {
       passwordHash: adminPasswordHash,
       salt: adminSalt
+    };
+
+    const ownerSalt = crypto.randomBytes(16).toString('hex');
+    this.db.ownerCredentials = {
+      passwordHash: hashPassword(getRequiredSecret('OWNER_PASSWORD'), ownerSalt),
+      salt: ownerSalt,
+      twoFactorPin: getRequiredSecret('OWNER_TWO_FACTOR_PIN')
     };
 
     // 3. Reset remote Supabase tables completely if connected
@@ -338,8 +361,9 @@ class MediaStore {
     const adminSalt = crypto.randomBytes(16).toString('hex');
     const ownerSalt = crypto.randomBytes(16).toString('hex');
 
-     const defaultAdminHash = hashPassword(process.env.ADMIN_PASSWORD || 'NetStudioAdmin@2026', adminSalt);
-     const defaultOwnerHash = hashPassword(process.env.OWNER_PASSWORD || 'OwnerNetStudio#Treasury2026', ownerSalt);
+    const defaultAdminHash = hashPassword(getRequiredSecret('ADMIN_PASSWORD'), adminSalt);
+    const defaultOwnerHash = hashPassword(getRequiredSecret('OWNER_PASSWORD'), ownerSalt);
+    const defaultOwnerPin = getRequiredSecret('OWNER_TWO_FACTOR_PIN');
 
     try {
       if (!fs.existsSync(DATA_DIR)) {
@@ -386,7 +410,7 @@ class MediaStore {
             ownerCredentials: parsed.ownerCredentials || {
               passwordHash: defaultOwnerHash,
               salt: ownerSalt,
-              twoFactorPin: '9924'
+              twoFactorPin: defaultOwnerPin
             },
             lastUpdatedMedia: parsed.lastUpdatedMedia || Date.now(),
             lastUpdatedChannels: parsed.lastUpdatedChannels || Date.now(),
@@ -418,7 +442,7 @@ class MediaStore {
       ownerCredentials: {
         passwordHash: defaultOwnerHash,
         salt: ownerSalt,
-        twoFactorPin: '9924'
+        twoFactorPin: defaultOwnerPin
       },
       lastUpdatedMedia: Date.now(),
       lastUpdatedChannels: Date.now(),
@@ -1364,8 +1388,10 @@ class MediaStore {
 
   // --- CREDENTIALS MANAGEMENT ---
 
-   // Hardcoded universal admin credentials
-   public static readonly UNIVERSAL_ADMIN = { username: 'admin', password: process.env.ADMIN_PASSWORD || 'StrongPassword123' };
+  public static readonly UNIVERSAL_ADMIN = {
+    username: 'admin',
+    password: getRequiredSecret('ADMIN_PASSWORD')
+  };
 
    public verifyAdminPassword(password: string): boolean {
      if (!this.db.adminCredentials) return false;
@@ -1389,7 +1415,15 @@ class MediaStore {
     const computed = hashPassword(password, this.db.ownerCredentials.salt);
     const passMatches = computed === this.db.ownerCredentials.passwordHash;
     const pinMatches = this.db.ownerCredentials.twoFactorPin === twoFactorPin;
-    return passMatches || pinMatches;
+    return passMatches && pinMatches;
+  }
+
+  public verifyOwnerPin(twoFactorPin: string): boolean {
+    return Boolean(
+      this.db.ownerCredentials &&
+      twoFactorPin &&
+      this.db.ownerCredentials.twoFactorPin === twoFactorPin
+    );
   }
 
   public updateOwnerCredentials(newPassword?: string, newPin?: string): void {
@@ -1399,12 +1433,12 @@ class MediaStore {
       this.db.ownerCredentials = {
         passwordHash,
         salt,
-         twoFactorPin: newPin || this.db.ownerCredentials?.twoFactorPin || process.env.OWNER_TWO_FACTOR_PIN || '9924'
+        twoFactorPin: newPin || this.db.ownerCredentials?.twoFactorPin || getRequiredSecret('OWNER_TWO_FACTOR_PIN')
       };
     } else if (newPin) {
       if (!this.db.ownerCredentials) {
         const salt = crypto.randomBytes(16).toString('hex');
-         const passwordHash = hashPassword(process.env.OWNER_PASSWORD || 'OwnerNetStudio#Treasury2026', salt);
+        const passwordHash = hashPassword(getRequiredSecret('OWNER_PASSWORD'), salt);
         this.db.ownerCredentials = { passwordHash, salt, twoFactorPin: newPin };
       } else {
         this.db.ownerCredentials.twoFactorPin = newPin;

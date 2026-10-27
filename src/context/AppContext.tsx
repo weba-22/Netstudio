@@ -395,7 +395,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const isTabAdmin = search.get('tab') === 'admin' || search.get('admin') === 'true';
       const isTabTreasury = search.get('tab') === 'treasury' || search.get('treasury') === 'true';
 
-      if (path === '/weba1-admin2' || path === '/admin' || hash === '/weba1-admin2' || hash === 'admin' || hash === '/admin' || isTabAdmin) {
+      if (path === '/weba1-admin2' || path === '/admin' || path === '/admin1-weba2' || hash === '/weba1-admin2' || hash === 'admin' || hash === '/admin' || hash === '/admin1-weba2' || isTabAdmin) {
         return '/weba1-admin2';
       }
       if (path === '/weba-token-wallet' || path === '/treasury' || hash === '/weba-token-wallet' || hash === 'treasury' || hash === '/treasury' || isTabTreasury) {
@@ -416,7 +416,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const isTabAdmin = search.get('tab') === 'admin' || search.get('admin') === 'true';
       const isTabTreasury = search.get('tab') === 'treasury' || search.get('treasury') === 'true';
 
-      if (path === '/weba1-admin2' || path === '/admin' || hash === '/weba1-admin2' || hash === 'admin' || hash === '/admin' || isTabAdmin) {
+      if (path === '/weba1-admin2' || path === '/admin' || path === '/admin1-weba2' || hash === '/weba1-admin2' || hash === 'admin' || hash === '/admin' || hash === '/admin1-weba2' || isTabAdmin) {
         return 'admin';
       }
       if (path === '/weba-token-wallet' || path === '/treasury' || hash === '/weba-token-wallet' || hash === 'treasury' || hash === '/treasury' || isTabTreasury) {
@@ -436,7 +436,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     }
     const lower = path.toLowerCase();
-    if (lower === '/weba1-admin2' || lower === '/admin' || lower === 'admin') setActiveNavTab('admin');
+    if (lower === '/weba1-admin2' || lower === '/admin' || lower === '/admin1-weba2' || lower === 'admin') setActiveNavTab('admin');
     else if (lower === '/weba-token-wallet' || lower === '/treasury' || lower === 'treasury') setActiveNavTab('treasury');
     else if (lower === '/') setActiveNavTab('home');
   }, []);
@@ -449,7 +449,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const isTabAdmin = search.get('tab') === 'admin' || search.get('admin') === 'true';
       const isTabTreasury = search.get('tab') === 'treasury' || search.get('treasury') === 'true';
 
-      if (path === '/weba1-admin2' || path === '/admin' || hash === '/weba1-admin2' || hash === 'admin' || hash === '/admin' || isTabAdmin) {
+      if (path === '/weba1-admin2' || path === '/admin' || path === '/admin1-weba2' || hash === '/weba1-admin2' || hash === 'admin' || hash === '/admin' || hash === '/admin1-weba2' || isTabAdmin) {
         setCurrentRoute('/weba1-admin2');
         setActiveNavTab('admin');
       } else if (path === '/weba-token-wallet' || path === '/treasury' || hash === '/weba-token-wallet' || hash === 'treasury' || hash === '/treasury' || isTabTreasury) {

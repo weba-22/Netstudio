@@ -642,7 +642,7 @@
         "streamChannelId": "BTN.rw",
         "status": "VERIFIED"
       },
-      "viewsCount": 0
+      "viewsCount": 1
     },
     {
       "id": "FlashTV.rw",
@@ -1602,8 +1602,8 @@
   "withdrawals": [],
   "auditLogs": [],
   "adminCredentials": {
-    "passwordHash": "27e7f4026c436b8a3b671b597387937d885536b3fa96a3dc5054273c68089aef1cdbf10f2c90047e6be411597d554df2dba6d554fb25d0594e816aa497134661",
-    "salt": "7e9b3b691e67283c8c27993f077fff13"
+    "passwordHash": "c615029fda33db540cd7a0e8dbb8bd2e7088e5357605b03c5664d7044a02fcf7729ebd057f06d78153d5cf926ab5f50bb99e1e680d174ef2839c32428ef13833",
+    "salt": "966cd9072251ed2e2c18765605719b0c"
   },
   "ownerCredentials": {
     "passwordHash": "b69c17b7b2d7ae244942bf1749d38a1882b20241aa8a16a197907701382f55ff11e56b227c1c4974966a9ee004e6892513b3639f266ad53a94a690b4e2f196d0",

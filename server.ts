@@ -2,6 +2,7 @@ import express from 'express';
 import session from 'express-session';
 import path from 'path';
 import fs from 'fs';
+import { randomBytes } from 'crypto';
 import { Readable } from 'stream';
 import { createServer as createViteServer } from 'vite';
 import { mediaStore } from './src/server/mediaStore';
@@ -14,9 +15,6 @@ declare module 'express-session' {
     token?: string;
   }
 }
-
- // Hardcoded universal admin credentials (Strict Single Master Admin Architecture)
- const ADMIN = { username: 'admin', password: process.env.ADMIN_PASSWORD || 'StrongPassword123' };
 
 export interface ParsedChannel {
   id: string; // Unique channel identity
@@ -1192,6 +1190,10 @@ function parseM3UPlaylist(m3uContent: string, maxLimit = 150): ParsedChannel[] {
 async function startServer() {
   const app = express();
   const PORT = 3000;
+  const sessionSecret = process.env.SESSION_SECRET;
+  if (!sessionSecret || sessionSecret.length < 32) {
+    throw new Error('SESSION_SECRET must be configured with at least 32 characters before starting NetStudio.');
+  }
 
   app.use(express.json({ limit: '15mb' }));
   app.use(express.urlencoded({ extended: true, limit: '15mb' }));
@@ -1199,7 +1201,7 @@ async function startServer() {
   // Session middleware for Role-Based Access Control (RBAC)
   app.use(
     session({
-      secret: process.env.SESSION_SECRET || 'netstudio_universal_rbac_secret_key_2026',
+      secret: sessionSecret,
       resave: false,
       saveUninitialized: true,
       cookie: {
@@ -1255,8 +1257,6 @@ async function startServer() {
  // -------------------------------------------------------------
  // UNIVERSAL ADMIN CREDENTIALS & SINGLE ADMIN ENFORCEMENT
  // -------------------------------------------------------------
- const ADMIN = { username: 'admin', password: process.env.ADMIN_PASSWORD || 'StrongPassword123' };
-
   // Function to enforce single admin and reset all unauthorized admin roles to null
   async function enforceSingleAdmin() {
     await mediaStore.enforceSingleAdmin();
@@ -1343,23 +1343,15 @@ async function startServer() {
         }
       }
 
-      // Auto-mount authorized Master Admin continuous sessions
-      if (!session && (token.startsWith('adm_tok_') || token.startsWith('own_tok_'))) {
-        session = {
-          role: token.startsWith('own_tok_') ? 'owner' : 'admin',
-          userId: 'admin_master',
-          expiresAt: Date.now() + 365 * 24 * 3600 * 1000
-        };
-        activeSessions.set(token, session);
-        mediaStore.saveSession(token, session);
-      }
-
       if (session && (session.role === 'admin' || session.role === 'owner') && session.expiresAt >= Date.now()) {
         if (req.session) {
           req.session.role = 'admin';
         }
         return next();
       }
+
+      activeSessions.delete(token);
+      mediaStore.deleteSession(token);
     }
 
     // Visitors or non-admins are denied access
@@ -1384,18 +1376,9 @@ async function startServer() {
       }
     }
 
-    if (!session && token.startsWith('own_tok_')) {
-      session = {
-        role: 'owner',
-        userId: 'owner_master',
-        expiresAt: Date.now() + 365 * 24 * 3600 * 1000
-      };
-      activeSessions.set(token, session);
-      mediaStore.saveSession(token, session);
-    }
-
     if (!session || session.role !== 'owner' || session.expiresAt < Date.now()) {
-      if (session) activeSessions.delete(token);
+      activeSessions.delete(token);
+      mediaStore.deleteSession(token);
       return res.status(403).json({ success: false, message: 'Forbidden: Owner session expired or unauthorized access' });
     }
 
@@ -1422,18 +1405,18 @@ async function startServer() {
 
     // Check if credentials match the single universal admin
     if (
-      (userIdentifier.toLowerCase() === ADMIN.username.toLowerCase() ||
-        userIdentifier === 'admin' ||
+      (userIdentifier.toLowerCase() === 'admin' ||
         userIdentifier === 'admin@netstudio.rw' ||
-        (!userIdentifier && (password === ADMIN.password || mediaStore.verifyAdminPassword(password)))) &&
-      (password === ADMIN.password || mediaStore.verifyAdminPassword(password))
+        !userIdentifier) &&
+      typeof password === 'string' &&
+      mediaStore.verifyAdminPassword(password)
     ) {
       recordSuccessfulAttempt(clientIp);
       req.session.role = 'admin';
       req.session.userId = 'admin_master';
-      req.session.username = ADMIN.username;
+      req.session.username = 'admin';
 
-      const token = `adm_tok_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+      const token = `adm_tok_${randomBytes(32).toString('hex')}`;
       const expiresAt = Date.now() + 365 * 24 * 3600 * 1000;
       const sessionData = {
         role: 'admin' as const,
@@ -1862,12 +1845,12 @@ async function startServer() {
   app.post('/api/admin/change-password', requireAdmin, (req, res) => {
     try {
       const { currentPassword, newPassword } = req.body;
-      if (!currentPassword || !newPassword) {
+      if (typeof currentPassword !== 'string' || typeof newPassword !== 'string' || !currentPassword || !newPassword) {
         return res.status(400).json({ success: false, message: 'Both current password and new password are required' });
       }
 
-      if (newPassword.length < 6) {
-        return res.status(400).json({ success: false, message: 'New password must be at least 6 characters long' });
+      if (newPassword.length < 12) {
+        return res.status(400).json({ success: false, message: 'New password must be at least 12 characters long' });
       }
 
       const isValid = mediaStore.verifyAdminPassword(currentPassword);
@@ -1900,9 +1883,9 @@ async function startServer() {
       });
     }
 
-    const { password, pin } = req.body;
-    if (!password) {
-      return res.status(400).json({ success: false, message: 'Owner master password required' });
+    const { password, pin } = req.body || {};
+    if (typeof password !== 'string' || typeof pin !== 'string' || !password || !pin) {
+      return res.status(400).json({ success: false, message: 'Owner password and 2FA PIN are required' });
     }
 
     const isValid = mediaStore.verifyOwnerPassword(password, pin);
@@ -1918,7 +1901,7 @@ async function startServer() {
     }
 
     recordSuccessfulAttempt(clientIp);
-    const token = `own_tok_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+    const token = `own_tok_${randomBytes(32).toString('hex')}`;
     const expiresAt = Date.now() + 4 * 3600 * 1000; // 4 hours validity for owner
     const ownerSession = { role: 'owner' as const, userId: 'owner_master', expiresAt };
     activeSessions.set(token, ownerSession);
@@ -2213,8 +2196,8 @@ async function startServer() {
       const { amount, method, provider, destinationAccount, destinationAccountName, bankName, pin, idempotencyKey } = req.body;
 
       // 1. PIN verification
-      const isPinValid = mediaStore.verifyOwnerPassword('OwnerNetStudio#Treasury2026', pin);
-      if (!isPinValid && pin !== '9924') {
+      const isPinValid = typeof pin === 'string' && mediaStore.verifyOwnerPin(pin);
+      if (!isPinValid) {
         mediaStore.addAuditLog({
           eventType: 'failed_login',
           details: `Failed withdrawal attempt: invalid 2FA PIN for destination ${destinationAccount}`,
@@ -2260,8 +2243,18 @@ async function startServer() {
   app.post('/api/treasury/security-update', requireOwner, (req, res) => {
     try {
       const { newPassword, newPin, currentPin } = req.body;
-      if (currentPin && currentPin !== '9924') {
+      if (typeof currentPin !== 'string' || !mediaStore.verifyOwnerPin(currentPin)) {
         return res.status(401).json({ success: false, message: 'Current 2FA PIN is incorrect' });
+      }
+      if (
+        (newPassword !== undefined && (typeof newPassword !== 'string' || newPassword.length < 12)) ||
+        (newPin !== undefined && (typeof newPin !== 'string' || !/^\d{6}$/.test(newPin))) ||
+        (!newPassword && !newPin)
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: 'Provide a new password of at least 12 characters and/or a new six-digit PIN.'
+        });
       }
 
       mediaStore.updateOwnerCredentials(newPassword, newPin);
