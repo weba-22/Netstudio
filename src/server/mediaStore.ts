@@ -474,7 +474,7 @@ class MediaStore {
     };
   }
 
-  public async addMovie(item: MediaItem): Promise<{ movie: MediaItem; lastUpdated: number }> {
+  public addMovie(item: MediaItem): { movie: MediaItem; lastUpdated: number } {
     const now = new Date().toISOString();
     const cleanItem: MediaItem = {
       ...item,
@@ -491,7 +491,6 @@ class MediaStore {
             ...ep,
             episodeNumber: ep.episodeNumber || idx + 1,
             videoUrl: cleanStreamUrl(ep.videoUrl),
-            // Episodes inherit the series artwork for visual consistency
             thumbnail: ep.thumbnail || ep.poster || item.backdrop || item.poster,
             poster: ep.poster || ep.thumbnail || item.poster || item.backdrop,
             status: ep.status || 'published',
@@ -545,17 +544,17 @@ class MediaStore {
     this.db.lastUpdatedMedia = Date.now();
     this.saveDatabase(this.db);
 
-     try {
-       const supabase = getSupabaseAdmin();
-       if (supabase) {
-         await supabase.from('movies').upsert(cleanItem, { onConflict: 'id' });
-       }
-     } catch {}
+    try {
+      const supabase = getSupabaseAdmin();
+      if (supabase) {
+        void supabase.from('movies').upsert(cleanItem, { onConflict: 'id' });
+      }
+    } catch {}
 
     return { movie: cleanItem, lastUpdated: this.db.lastUpdatedMedia };
   }
 
-  public async updateMovie(id: string, item: MediaItem): Promise<{ movie: MediaItem | null; lastUpdated: number }> {
+  public updateMovie(id: string, item: MediaItem): { movie: MediaItem | null; lastUpdated: number } {
     const now = new Date().toISOString();
     const index = this.db.movies.findIndex((m) => m.id === id);
     if (index >= 0) {
@@ -616,29 +615,29 @@ class MediaStore {
       this.db.lastUpdatedMedia = Date.now();
       this.saveDatabase(this.db);
 
-       try {
-         const supabase = getSupabaseAdmin();
-         if (supabase) {
-           await supabase.from('movies').upsert(updated, { onConflict: 'id' });
-         }
-       } catch {}
+      try {
+        const supabase = getSupabaseAdmin();
+        if (supabase) {
+          void supabase.from('movies').upsert(updated, { onConflict: 'id' });
+        }
+      } catch {}
 
       return { movie: updated, lastUpdated: this.db.lastUpdatedMedia };
     }
     return this.addMovie({ ...item, id });
   }
 
-  public async deleteMovie(id: string): Promise<{ success: boolean; lastUpdated: number }> {
+  public deleteMovie(id: string): { success: boolean; lastUpdated: number } {
     this.db.movies = this.db.movies.filter((m) => m.id !== id);
     this.db.lastUpdatedMedia = Date.now();
     this.saveDatabase(this.db);
 
-     try {
-       const supabase = getSupabaseAdmin();
-       if (supabase) {
-         await supabase.from('movies').delete().eq('id', id);
-       }
-     } catch {}
+    try {
+      const supabase = getSupabaseAdmin();
+      if (supabase) {
+        void supabase.from('movies').delete().eq('id', id);
+      }
+    } catch {}
 
     return { success: true, lastUpdated: this.db.lastUpdatedMedia };
   }
@@ -653,7 +652,7 @@ class MediaStore {
     return 0;
   }
 
-  public async bulkSyncMovies(movies: MediaItem[]): Promise<{ count: number; lastUpdated: number }> {
+  public bulkSyncMovies(movies: MediaItem[]): { count: number; lastUpdated: number } {
     if (!Array.isArray(movies) || movies.length === 0) {
       return { count: this.db.movies.length, lastUpdated: this.db.lastUpdatedMedia };
     }
@@ -665,14 +664,14 @@ class MediaStore {
     this.db.lastUpdatedMedia = Date.now();
     this.saveDatabase(this.db);
 
-     try {
-       const supabase = getSupabaseAdmin();
-       if (supabase) {
-         for (const m of movies) {
-           await supabase.from('movies').upsert(m, { onConflict: 'id' });
-         }
-       }
-     } catch {}
+    try {
+      const supabase = getSupabaseAdmin();
+      if (supabase) {
+        for (const m of movies) {
+          void supabase.from('movies').upsert(m, { onConflict: 'id' });
+        }
+      }
+    } catch {}
 
     return { count: this.db.movies.length, lastUpdated: this.db.lastUpdatedMedia };
   }
@@ -686,7 +685,7 @@ class MediaStore {
     };
   }
 
-  public async addChannel(channel: LiveChannel): Promise<{ channel: LiveChannel; lastUpdated: number }> {
+  public addChannel(channel: LiveChannel): { channel: LiveChannel; lastUpdated: number } {
     const existingIndex = this.db.channels.findIndex((c) => c.id === channel.id);
     if (existingIndex >= 0) {
       this.db.channels[existingIndex] = channel;
@@ -696,12 +695,12 @@ class MediaStore {
     this.db.lastUpdatedChannels = Date.now();
     this.saveDatabase(this.db);
 
-     try {
-       const supabase = getSupabaseAdmin();
-       if (supabase) {
-         await supabase.from('channels').upsert(channel, { onConflict: 'id' });
-       }
-     } catch {}
+    try {
+      const supabase = getSupabaseAdmin();
+      if (supabase) {
+        void supabase.from('channels').upsert(channel, { onConflict: 'id' });
+      }
+    } catch {}
 
     return { channel, lastUpdated: this.db.lastUpdatedChannels };
   }
@@ -714,9 +713,9 @@ class MediaStore {
       this.saveDatabase(this.db);
 
       try {
-        const firestore = getSupabaseAdmin();
-        if (firestore) {
-          firestore.collection('channels').doc(id).set(this.db.channels[index], { merge: true }).catch(() => {});
+        const supabase = getSupabaseAdmin();
+        if (supabase) {
+          void supabase.from('channels').upsert(this.db.channels[index], { onConflict: 'id' });
         }
       } catch {}
 
@@ -731,9 +730,9 @@ class MediaStore {
     this.saveDatabase(this.db);
 
     try {
-      const firestore = getSupabaseAdmin();
-      if (firestore) {
-        firestore.collection('channels').doc(id).delete().catch(() => {});
+      const supabase = getSupabaseAdmin();
+      if (supabase) {
+        void supabase.from('channels').delete().eq('id', id);
       }
     } catch {}
 
@@ -763,13 +762,11 @@ class MediaStore {
     this.saveDatabase(this.db);
 
     try {
-      const firestore = getSupabaseAdmin();
-      if (firestore) {
-        const batch = firestore.batch();
+      const supabase = getSupabaseAdmin();
+      if (supabase) {
         for (const c of channels) {
-          batch.set(firestore.collection('channels').doc(c.id), c, { merge: true });
+          void supabase.from('channels').upsert(c, { onConflict: 'id' });
         }
-        batch.commit().catch(() => {});
       }
     } catch {}
 
