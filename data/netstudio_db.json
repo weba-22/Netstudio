@@ -161,7 +161,7 @@
       "episodesCount": 8,
       "partsCount": 0,
       "parts": [],
-      "viewsCount": 31,
+      "viewsCount": 32,
       "createdAt": "2026-08-23T20:36:37.691Z",
       "updatedAt": "2026-08-23T22:11:57.240Z"
     },
@@ -516,7 +516,7 @@
       "isLive": true,
       "currentProgram": "Live Stream Broadcast",
       "isPremiumOnly": false,
-      "viewsCount": 0
+      "viewsCount": 1
     },
     {
       "id": "RwandaTelevision.rw",
@@ -1602,8 +1602,8 @@
   "withdrawals": [],
   "auditLogs": [],
   "adminCredentials": {
-    "passwordHash": "b9d08da767e2aff5da04918bae83528c0d88dab1ddf7965437601e7704e8531d20372fd36da834d0df5998b90112d4fdb7a14012a3b3e910a2995373a1da6bfa",
-    "salt": "efdd99e059236f55242eb3232c0024cc"
+    "passwordHash": "27e7f4026c436b8a3b671b597387937d885536b3fa96a3dc5054273c68089aef1cdbf10f2c90047e6be411597d554df2dba6d554fb25d0594e816aa497134661",
+    "salt": "7e9b3b691e67283c8c27993f077fff13"
   },
   "ownerCredentials": {
     "passwordHash": "b69c17b7b2d7ae244942bf1749d38a1882b20241aa8a16a197907701382f55ff11e56b227c1c4974966a9ee004e6892513b3639f266ad53a94a690b4e2f196d0",
