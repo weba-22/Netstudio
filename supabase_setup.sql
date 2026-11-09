@@ -1,60 +1,56 @@
--- 1. Movies/Series Table
-CREATE TABLE IF NOT EXISTS movies (
-    id TEXT PRIMARY KEY,
-    title TEXT,
-    titleRw TEXT,
-    description TEXT,
-    descriptionRw TEXT,
-    poster TEXT,
-    backdrop TEXT,
-    videoUrl TEXT,
-    trailerUrl TEXT,
-    status TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    views_count INTEGER DEFAULT 0,
-    seasons_count INTEGER DEFAULT 0,
-    episodes_count INTEGER DEFAULT 0,
-    parts_count INTEGER DEFAULT 0,
-    seasons JSONB,
-    episodes JSONB,
-    parts JSONB
-);
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
 
--- 2. Channels Table
-CREATE TABLE IF NOT EXISTS channels (
-    id TEXT PRIMARY KEY,
-    name TEXT,
-    stream_url TEXT,
-    icon TEXT,
-    views_count INTEGER DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+CREATE TABLE public.movies (
+  id text NOT NULL,
+  title text,
+  titlerw text,
+  description text,
+  descriptionrw text,
+  poster text,
+  backdrop text,
+  videourl text,
+  trailerurl text,
+  status text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  views_count integer DEFAULT 0,
+  seasons_count integer DEFAULT 0,
+  episodes_count integer DEFAULT 0,
+  parts_count integer DEFAULT 0,
+  seasons jsonb,
+  episodes jsonb,
+  parts jsonb,
+  CONSTRAINT movies_pkey PRIMARY KEY (id)
 );
-
--- 3. Plans Table
-CREATE TABLE IF NOT EXISTS plans (
-    id TEXT PRIMARY KEY,
-    name TEXT,
-    price DECIMAL,
-    duration_days INTEGER
+CREATE TABLE public.channels (
+  id text NOT NULL,
+  name text,
+  stream_url text,
+  icon text,
+  views_count integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT channels_pkey PRIMARY KEY (id)
 );
-
--- 4. Promotions Table
-CREATE TABLE IF NOT EXISTS promotions (
-    id TEXT PRIMARY KEY,
-    is_global_free_active BOOLEAN
+CREATE TABLE public.plans (
+  id text NOT NULL,
+  name text,
+  price numeric,
+  duration_days integer,
+  CONSTRAINT plans_pkey PRIMARY KEY (id)
 );
-
--- 5. Users Table
-CREATE TABLE IF NOT EXISTS users (
-    id TEXT PRIMARY KEY,
-    username TEXT,
-    name TEXT,
-    email TEXT UNIQUE,
-    role TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+CREATE TABLE public.promotions (
+  id text NOT NULL,
+  is_global_free_active boolean,
+  CONSTRAINT promotions_pkey PRIMARY KEY (id)
 );
-
--- Enable Realtime for movies table
-ALTER PUBLICATION supabase_realtime ADD TABLE movies;
+CREATE TABLE public.users (
+  id text NOT NULL,
+  username text,
+  name text,
+  email text UNIQUE,
+  role text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT users_pkey PRIMARY KEY (id)
+);

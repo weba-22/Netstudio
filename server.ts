@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import session from 'express-session';
 import path from 'path';
@@ -1189,7 +1190,7 @@ function parseM3UPlaylist(m3uContent: string, maxLimit = 150): ParsedChannel[] {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
   const sessionSecret = process.env.SESSION_SECRET;
   if (!sessionSecret || sessionSecret.length < 32) {
     throw new Error('SESSION_SECRET must be configured with at least 32 characters before starting NetStudio.');

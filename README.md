@@ -12,4 +12,6 @@ OWNER_TWO_FACTOR_PIN=<six-digit PIN>
 SESSION_SECRET=<random secret with at least 32 characters>
 ```
 
+Run `npm run dev` to start the local server on port 3000. To use a different port, set `PORT` before starting it (for example, `PORT=4173`).
+
 Do not commit `.env` or share these values in chat. The admin portal is available at `/admin1-weba2`; the owner treasury is at `/weba-token-wallet`. Both routes show their login gate and still require valid credentials.

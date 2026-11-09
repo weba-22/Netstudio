@@ -1602,13 +1602,13 @@
   "withdrawals": [],
   "auditLogs": [],
   "adminCredentials": {
-    "passwordHash": "c615029fda33db540cd7a0e8dbb8bd2e7088e5357605b03c5664d7044a02fcf7729ebd057f06d78153d5cf926ab5f50bb99e1e680d174ef2839c32428ef13833",
-    "salt": "966cd9072251ed2e2c18765605719b0c"
+    "passwordHash": "ac6d0177925be469ee91627ed087413926be601b06439b52eedad11ad87ec82cfee04550024c9f6797ed68503d49815a6af1e5944e0172a9c495be875ab2b9de",
+    "salt": "5adc803ef0fccebc4d8166bec51aedc5"
   },
   "ownerCredentials": {
-    "passwordHash": "b69c17b7b2d7ae244942bf1749d38a1882b20241aa8a16a197907701382f55ff11e56b227c1c4974966a9ee004e6892513b3639f266ad53a94a690b4e2f196d0",
-    "salt": "909b67df17862990886d2cf7b04289c4",
-    "twoFactorPin": "9924"
+    "passwordHash": "7b7249e2f374ceed8ba2e3eb8360109b4bee4351796957be8a37d7ceff01127524dab7dba0e1d6463f4ac5d43548dfccc3512e819812b2b7cac81a8456752a54",
+    "salt": "1cec428ac38c9a5a1f3c27306f84f5d9",
+    "twoFactorPin": "106087"
   },
   "lastUpdatedMedia": 1787523175041,
   "lastUpdatedChannels": 1787558230316,
