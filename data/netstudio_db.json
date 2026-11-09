@@ -1602,8 +1602,8 @@
   "withdrawals": [],
   "auditLogs": [],
   "adminCredentials": {
-    "passwordHash": "ac6d0177925be469ee91627ed087413926be601b06439b52eedad11ad87ec82cfee04550024c9f6797ed68503d49815a6af1e5944e0172a9c495be875ab2b9de",
-    "salt": "5adc803ef0fccebc4d8166bec51aedc5"
+    "passwordHash": "ab444f0158f70d68c4ab660d738cba14c8dbb13c00076e5af4baf9f1dfcb6a3fdcd6b217e0b275663ee6f51f46582369e12064f527d931a8608a93c7070a788c",
+    "salt": "8bdc6ad6c435068fd1d45c421f2c2c18"
   },
   "ownerCredentials": {
     "passwordHash": "7b7249e2f374ceed8ba2e3eb8360109b4bee4351796957be8a37d7ceff01127524dab7dba0e1d6463f4ac5d43548dfccc3512e819812b2b7cac81a8456752a54",
