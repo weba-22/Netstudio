@@ -94,89 +94,38 @@ export const clearInstallBannerDismissed = (): void => {
   }
 };
 
-/**
- * App shell version — bump this whenever the player/streaming logic changes.
- * A mismatch triggers a ONE-TIME purge of every stale Service Worker and
- * cache, followed by a single automatic reload so users ALWAYS run the
- * latest player code (no more hijacked/refreshing playback sessions).
- */
-export const APP_SHELL_VERSION = 'netstudio-shell-v3';
-const SHELL_VERSION_KEY = 'netstudio_active_shell_version';
+let serviceWorkerRegistration: Promise<void> | null = null;
 
-// Purge EVERYTHING stale (old workers + caches) when the shell version changes
-const purgeStaleAppShell = async (): Promise<boolean> => {
-  if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('caches' in window)) {
-    return false;
+// Register once so Strict Mode remounts do not add duplicate update handlers.
+export const registerNetStudioServiceWorker = (): Promise<void> => {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+    return Promise.resolve();
   }
-  let purged = false;
-  try {
-    const registrations = await navigator.serviceWorker.getRegistrations();
-    await Promise.all(registrations.map((reg) => reg.unregister()));
-    purged = registrations.length > 0;
-    const cacheNames = await caches.keys();
-    await Promise.all(cacheNames.map((name) => caches.delete(name)));
-    localStorage.setItem(SHELL_VERSION_KEY, APP_SHELL_VERSION);
-    console.log('[NetStudio PWA] Stale app shell purged; fresh version loaded.');
-  } catch {
-    try {
-      localStorage.setItem(SHELL_VERSION_KEY, APP_SHELL_VERSION);
-    } catch { /* silent */ }
-  }
-  return purged;
-};
+  if (serviceWorkerRegistration) return serviceWorkerRegistration;
 
-// Register Service Worker in production
-export const registerNetStudioServiceWorker = async (): Promise<void> => {
-  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
-
-  // 1. One-time migration: wipe old workers/caches if the shell version changed
-  try {
-    const activeVersion = localStorage.getItem(SHELL_VERSION_KEY);
-    if (activeVersion && activeVersion !== APP_SHELL_VERSION) {
-      const didPurge = await purgeStaleAppShell();
-      if (didPurge) {
-        window.location.reload();
-        return;
-      }
-    } else if (!activeVersion) {
-      localStorage.setItem(SHELL_VERSION_KEY, APP_SHELL_VERSION);
-    }
-  } catch { /* silent */ }
-
-  try {
-    const registration = await navigator.serviceWorker.register('/sw.js', {
+  serviceWorkerRegistration = navigator.serviceWorker
+    .register('/sw.js', {
       scope: '/'
-    });
-
-    // Auto-activate new workers instantly (no waiting for user refresh)
-    registration.addEventListener('updatefound', () => {
-      const newWorker = registration.installing;
-      if (newWorker) {
-        newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            newWorker.postMessage({ type: 'SKIP_WAITING' });
-          }
+    })
+    .then((registration) => {
+      const updateRegistration = () => {
+        registration.update().catch((err) => {
+          console.warn('[NetStudio PWA] Service Worker update check failed:', err);
         });
-      }
-    });
+      };
 
-    let refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (refreshing) return;
-      refreshing = true;
-      window.location.reload();
-    });
+      setInterval(updateRegistration, 30 * 60 * 1000);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') updateRegistration();
+      });
 
-    // Poll for updates every 30 minutes and on tab focus
-    setInterval(() => registration.update().catch(() => {}), 30 * 60 * 1000);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') registration.update().catch(() => {});
+      console.log('[NetStudio PWA] Service Worker registered successfully, scope:', registration.scope);
+    })
+    .catch((err) => {
+      serviceWorkerRegistration = null;
+      console.warn('[NetStudio PWA] Service Worker registration note:', err);
     });
-
-    console.log('[NetStudio PWA] Service Worker registered successfully, scope:', registration.scope);
-  } catch (err) {
-    console.warn('[NetStudio PWA] Service Worker registration note:', err);
-  }
+  return serviceWorkerRegistration;
 };
 
 // Request Push Notification Permission
