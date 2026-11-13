@@ -265,7 +265,8 @@ export const VideoPlayer: React.FC = () => {
   }, [activeDirectUrl, isIframeMode, usingProxy, activePlayingMedia?.startTime]);
 
   // Native Video Error handler
-  const handleNativeVideoError = () => {
+  const handleNativeVideoError = (e: any) => {
+    console.error('Video Error:', e);
     if (!isIframeMode) {
       if (!usingProxy && !currentStreamUrl.startsWith('/api/iptv/proxy')) {
         setUsingProxy(true);

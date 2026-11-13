@@ -313,7 +313,7 @@
       "language": "Kinyarwanda & English",
       "quality": "4K",
       "createdAt": "2025-01-08T10:00:00Z",
-      "viewsCount": 1,
+      "viewsCount": 2,
       "episodes": [
         {
           "id": "s1-e1",
@@ -1611,7 +1611,7 @@
     }
   ],
   "promotion": {
-    "isGlobalFreeActive": false,
+    "isGlobalFreeActive": true,
     "promoTitle": "Free Access Promotional Event",
     "promoTitleRw": "Poromosiyo: Kureba Byose Ku Buntu!",
     "promoMessage": "All VIP movies, TV series, and live channels are currently unlocked and accessible for free!",
@@ -1624,55 +1624,19 @@
   "notifications": [],
   "supportMessages": [],
   "withdrawals": [],
-  "auditLogs": [
-    {
-      "id": "audit_1794557277481_9yud",
-      "timestamp": "2026-11-13T08:07:57.481Z",
-      "eventType": "failed_login",
-      "details": "Failed Owner Treasury access attempt from IP: 127.0.0.1",
-      "detailsRw": "Kugerageza kwinjira mu isanduku y'umutungo byanze ku murongo IP: 127.0.0.1",
-      "ipAddress": "127.0.0.1",
-      "severity": "security"
-    },
-    {
-      "id": "audit_1794557259071_l256",
-      "timestamp": "2026-11-13T08:07:39.071Z",
-      "eventType": "failed_login",
-      "details": "Failed Owner Treasury access attempt from IP: 127.0.0.1",
-      "detailsRw": "Kugerageza kwinjira mu isanduku y'umutungo byanze ku murongo IP: 127.0.0.1",
-      "ipAddress": "127.0.0.1",
-      "severity": "security"
-    },
-    {
-      "id": "audit_1794557086200_8qlv",
-      "timestamp": "2026-11-13T08:04:46.200Z",
-      "eventType": "login",
-      "details": "Universal Master Admin login from IP: 127.0.0.1",
-      "detailsRw": "Kwinjira neza nk'umuyobozi mukuru (Universal Admin) ku murongo IP: 127.0.0.1",
-      "ipAddress": "127.0.0.1",
-      "severity": "info"
-    }
-  ],
+  "auditLogs": [],
   "adminCredentials": {
-    "passwordHash": "b4fd09dd7ff670780acb26018fd28e2a664125cba4c9d6546947d64a52e787766e4d7499fe41534db74959072bd11e387cf827708d85489861c17164f9e1d75c",
-    "salt": "f27d5ee57ebbae863c9f4a6df9987c28"
+    "passwordHash": "9d0112a2a6ae8ea5b7992facd8f9647ac04bbe3f2f37b00d3d51034d4ca6792df1be549502435b47d2e311c0b59ea7bd58fd046d7549d43f718be94d2406f7ec",
+    "salt": "275e0ea51243a0f6370dd86ae6cf2a6c"
   },
   "ownerCredentials": {
-    "passwordHash": "3143b03bcb4730a61442ae38ae15d0ab138e72cae570a8f07d07e6cc9a048db54b70d58ec6a94ba60974e6cef00dd13b2c78f687c01247f84d73e1050b96fb9c",
-    "salt": "13d510019ed65481b6bf9757779c0f24",
+    "passwordHash": "50303dd491136ec2e8b58f21aeb569e68b963b061986c96604ef0e6c8589d44f5052d1825802289baf9a86a8b7881a6200ea12b848285cd36362239ebce49fe0",
+    "salt": "0bb4ddd9a84832845c57c80e25a7a392",
     "twoFactorPin": "106087"
   },
   "lastUpdatedMedia": 1794558040042,
   "lastUpdatedChannels": 1787558230316,
   "lastUpdatedPlans": 1787419151518,
-  "lastUpdatedPromotion": 1787419151518,
-  "activeSessions": {
-    "adm_tok_9a16e32342cad383c11d7d428e500c804019f36fd2f16e745d3eeb8cb20182d5": {
-      "role": "admin",
-      "userId": "admin_master",
-      "deviceName": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
-      "createdAt": 1794557086198,
-      "expiresAt": 1826093086198
-    }
-  }
+  "lastUpdatedPromotion": 1794558335597,
+  "activeSessions": {}
 }
